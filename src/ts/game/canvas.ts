@@ -44,11 +44,29 @@ export class Canvas {
             frameRate: 2,
             animations: {
                 idleRight: {
-                    frameRate: 11,
-                    frameBuffer: 2,
+                    frameRate: 2,
+                    frameBuffer: 18,
                     loop: true,
                     src: "./assets/img/idleRight.png",
                 },
+                idleLeft: {
+                    frameRate: 2,
+                    frameBuffer: 18,
+                    loop: true,
+                    src: "./assets/img/idleLeft.png",
+                },
+                jumpRight: {
+                    frameRate: 2,
+                    frameBuffer: 12,
+                    loop: false,
+                    src: "./assets/img/jumpRight.png",
+                },
+                jumpLeft: {
+                    frameRate: 2,
+                    frameBuffer: 12,
+                    loop: false,
+                    src: "./assets/img/jumpLeft.png",
+                }
             }
         })
 
