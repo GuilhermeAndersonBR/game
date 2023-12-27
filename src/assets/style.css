@@ -6,13 +6,15 @@
 }
 
 body {
-    /* display: flex;
+    background-color: black;
+    display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh; */
+    min-height: 100vh;
 }
 
 canvas {
     width: calc(64px * 24);
     height: calc(64px * 12);
+    border: 16px groove rgb(207, 75, 75);
 }

@@ -4,7 +4,6 @@ import { AnimationsInterface, PositionInterface, SizeInterface } from "../../int
 import { Player } from "../elements/Player.js";
 import { InterfaceElement } from "../interface/InterfaceElement.js";
 import { CollisionBlock } from "./CollisionBlock.js";
-import { KeyBoard } from "./Keyboard.js";
 import { Mouse } from "./Mouse.js";
 import { Sprite } from "./Sprite.js";
 
@@ -25,7 +24,7 @@ export class GameCreator {
     readonly ctx: CanvasRenderingContext2D;
     readonly mouse: Mouse;
     layers: LayerInterface[];
-    collisionBlocks: any[];
+    collisionBlocks: CollisionBlock[];
 
     constructor({ canvas, ctx, mouse }: GameCreatorInterface) {
         this.canvas = canvas;
@@ -61,6 +60,7 @@ export class GameCreator {
         const player = new Player({
             canvas: canvas,
             ctx: ctx,
+            collisions: this.collisionBlocks,
             position: position,
             src: src,
             frameRate: frameRate,
@@ -119,7 +119,7 @@ export class GameCreator {
         findObject({list: layers, key: "name", keyValue: "UI"}).elements.push(sprite);
     };
 
-    private createCollisions(): void {
+    public createCollisions(): void {
         const parsedCollisions = parse2D({
             array: collisionOfLevel
         });
@@ -140,14 +140,9 @@ export class GameCreator {
     public update(): void {
         this.updateLayer("Player");
         this.updateLayer("UI");
-
-        this.collisionBlocks.forEach(collisionBlock => {
-            collisionBlock.update();
-        });
     };
 
     public setup(): void {
-        this.createCollisions();
 
         this.layers.forEach(layer => {
             layer.setups.forEach((element: { setup: () => void; }) => {

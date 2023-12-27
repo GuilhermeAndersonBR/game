@@ -1,10 +1,12 @@
 import { ActionInterface, PositionInterface, SizeInterface } from "../../interfaces.js";
+import { CollisionBlock } from "../utils/CollisionBlock.js";
 import { KeyBoard } from "../utils/Keyboard.js";
 import { Sprite, SpriteInterface } from "../utils/Sprite.js";
 
 interface PlayerInterface {
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
+    collisions: CollisionBlock[],
     src: string,
     position: PositionInterface,
 };
@@ -25,6 +27,7 @@ interface KeysInterface {
 export class Player extends Sprite {
     readonly canvas: HTMLCanvasElement;
     readonly ctx: CanvasRenderingContext2D;
+    collisions: CollisionBlock[];
     keyBoard: KeyBoard;
     hitBox: HitBoxInterface;
     velocity: PositionInterface;
@@ -33,7 +36,7 @@ export class Player extends Sprite {
     status: any;
 
     constructor({ 
-        canvas, ctx, position, src, frameRate, animations, frameBuffer, loop, autoplay 
+        canvas, ctx, collisions, position, src, frameRate, animations, frameBuffer, loop, autoplay 
     }: SpriteInterface & PlayerInterface) {
         super({
             canvas: canvas, 
@@ -48,6 +51,7 @@ export class Player extends Sprite {
         });
         this.canvas = canvas;
         this.ctx = ctx;
+        this.collisions = collisions;
         this.keyBoard = new KeyBoard({
             actions: this.actions()
         });
@@ -165,8 +169,8 @@ export class Player extends Sprite {
         };
     };
 
-    private drawPlayer(): void {
-        // this.ctx.fillStyle = "rgba(255,0,0, 0.2)";
+    private drawHitBox(): void {
+        // this.ctx.fillStyle = "rgba(0,255,150, 0.2)";
 
         // this.ctx.fillRect(
         //     this.hitBox.position.x, 
@@ -191,26 +195,99 @@ export class Player extends Sprite {
 
     public setup(): void {
         console.log("setup feito com sucesso");
+        console.log(this.collisions);
         
         this.keyBoard.update();
     };
 
-    public update(): void {
+    private isCollidingHorizontal(nextX: number, collisionBlock: CollisionBlock): boolean {
+        const playerLeft = nextX;
+        const playerRight = nextX + this.hitBox.size.width;
+        const playerTop = this.hitBox.position.y;
+        const playerBottom = this.hitBox.position.y + this.hitBox.size.height;
+    
+        const blockLeft = collisionBlock.position.x;
+        const blockRight = collisionBlock.position.x + collisionBlock.size.width;
+        const blockTop = collisionBlock.position.y;
+        const blockBottom = collisionBlock.position.y + collisionBlock.size.height;
+    
+        return (
+            playerRight > blockLeft &&
+            playerLeft < blockRight &&
+            playerBottom > blockTop &&
+            playerTop < blockBottom
+        );
+    }
+    
+    private isCollidingVertical(nextY: number, collisionBlock: CollisionBlock): boolean {
+        const playerLeft = this.hitBox.position.x;
+        const playerRight = this.hitBox.position.x + this.hitBox.size.width;
+        const playerTop = nextY;
+        const playerBottom = nextY + this.hitBox.size.height;
+    
+        const blockLeft = collisionBlock.position.x;
+        const blockRight = collisionBlock.position.x + collisionBlock.size.width;
+        const blockTop = collisionBlock.position.y;
+        const blockBottom = collisionBlock.position.y + collisionBlock.size.height;
+    
+        return (
+            playerRight > blockLeft &&
+            playerLeft < blockRight &&
+            playerBottom > blockTop &&
+            playerTop < blockBottom
+        );
+    }
+    
+    private checkForVerticalCollisions(): void {
+        const nextY = this.position.y + this.velocity.y;
+    
+        for (const collisionBlock of this.collisions) {
+            if (this.isCollidingVertical(nextY, collisionBlock)) {
+                if (this.velocity.y > 0) {
+                    this.velocity.y = 0;
+                    this.position.y = collisionBlock.position.y - this.hitBox.size.height;
+                    this.status.jump.currents = this.status.jump.limit;
+                } else if (this.velocity.y < 0) {
+                    this.velocity.y = 0;
+                    this.position.y = collisionBlock.position.y + collisionBlock.size.height;
+                }
+            }
+        }
+    }
+    
+    private checkForHorizontalCollisions(): void {
+        const nextX = this.position.x + this.velocity.x;
+    
+        for (const collisionBlock of this.collisions) {
+            if (this.isCollidingHorizontal(nextX, collisionBlock)) {
+                if (this.velocity.x > 0) {
+                    this.velocity.x = 0;
+                    this.position.x = collisionBlock.position.x - this.hitBox.size.width;
+                } else if (this.velocity.x < 0) {
+                    this.velocity.x = 0;
+                    this.position.x = collisionBlock.position.x + collisionBlock.size.width;
+                }
+            }
+        }
+    }
+
+    private applyGravity(): void {
         this.position.y += this.velocity.y;
         this.velocity.y += this.gravity;
+    }
 
+    public update(): void {
         this.position.x += this.velocity.x;
 
-        if(this.position.y + this.hitBox.size.height > this.canvas.height) {
-            this.velocity.y = 0;
-            this.position.y = this.canvas.height - this.hitBox.size.height;
-            this.status.jump.currents = this.status.jump.limit;
-        }
-
-        //console.log(this.keyBoard.key.pressed);
+        this.checkForHorizontalCollisions();
+        this.applyGravity();
 
         this.updateHitbox();
-        this.drawPlayer();
+
+        this.drawHitBox();
+
+        this.checkForVerticalCollisions();
+
         super.update();
         
         this.movements();

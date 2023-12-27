@@ -42,8 +42,8 @@ export const parse2D = ({ array }: {array: any[]}): any[] => {
     return rows;
 };
 
-export const createObjectsFrom2D = ({ ctx, array }: {ctx: CanvasRenderingContext2D, array: any[]}): any[] => {
-    const objects: any[] = [];
+export const createObjectsFrom2D = ({ ctx, array }: {ctx: CanvasRenderingContext2D, array: any[]}): CollisionBlock[] => {
+    const objects: CollisionBlock[] = [];
     array.forEach((row, y) => {
         row.forEach((symbol: number, x: number) => {
             if (symbol === 1025 || symbol === 250) {

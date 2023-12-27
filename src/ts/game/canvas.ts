@@ -1,4 +1,4 @@
-import { clearWindow, findObject, preventDefaults } from "./auxfunctions.js";
+import { clearWindow, preventDefaults } from "./auxfunctions.js";
 import { GameCreator } from "./class/utils/GameCreator.js";
 import { Mouse } from "./class/utils/Mouse.js";
 
@@ -37,7 +37,7 @@ export class Canvas {
             src: "./assets/img/idleRight.png",
             position: {
                 x: 50,
-                y: 50
+                y: 184
             },
             frameBuffer: 12,
             frameRate: 2,
@@ -72,7 +72,7 @@ export class Canvas {
         this.gameCreator.createSprite({
             position: {
                 x: 30,
-                y: 30
+                y: 184
             },
             frameRate: 9,
             src: "./assets/img/animation.png"
@@ -99,6 +99,7 @@ export class Canvas {
         preventDefaults();
 
         this.defineInputs();
+        this.gameCreator.createCollisions();
         this.draw();
         this.gameCreator.setup();
         this.update();
