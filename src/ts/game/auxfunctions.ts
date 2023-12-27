@@ -1,3 +1,5 @@
+import { CollisionBlock } from "./class/utils/CollisionBlock.js";
+
 interface FindObjectInterface {
     (objects: {list: any[], key: string, keyValue: string}): any;
 };
@@ -28,4 +30,36 @@ export const preventDefaults = (): void => {
     document.addEventListener('contextmenu', (event): void => {
         event.preventDefault();
     });
-}
+};
+
+export const parse2D = ({ array }: {array: any[]}): any[] => {
+    const rows = [];
+    console.log(array.length);
+    for (let i = 0; i < array.length; i += 24) {
+        rows.push(array.slice(i, i + 24));
+    };
+  
+    return rows;
+};
+
+export const createObjectsFrom2D = ({ ctx, array }: {ctx: CanvasRenderingContext2D, array: any[]}): any[] => {
+    const objects: any[] = [];
+    array.forEach((row, y) => {
+        row.forEach((symbol: number, x: number) => {
+            if (symbol === 1025 || symbol === 250) {
+                // push a new collision into collisionblocks array
+                objects.push(
+                    new CollisionBlock({
+                        ctx: ctx,
+                        position: {
+                            x: x * 64,
+                            y: y * 64
+                        }
+                    })
+                );
+            }
+        });
+    });
+  
+    return objects;
+};

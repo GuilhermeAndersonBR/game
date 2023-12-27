@@ -85,52 +85,13 @@ export class Player extends Sprite {
             },
             KeyJump: {
                 pressed: false
+            },
+            KeyAttack: {
+                pressed: false
             }
         }
 
         this.gravity = 1;
-    }
-
-    private movements(): void {
-        this.velocity.x = 0;
-
-        if(this.keys.KeyMoveRight.pressed) {
-            this.velocity.x = 10;
-            this.switchSprite('idleRight');
-            this.status.lastDirection = "right";
-        } else if(this.keys.KeyMoveLeft.pressed) {
-            this.velocity.x = -10;
-            this.switchSprite('idleLeft');
-            this.status.lastDirection = "left";
-        } else {
-            if(this.status.lastDirection == "right") this.switchSprite('idleRight');
-            else if(this.status.lastDirection == "left") this.switchSprite('idleLeft');
-        }
-
-        if(this.keys.KeyJump.pressed) {
-            if(this.status.jump.currents !== 0) {
-                this.velocity.y = -15;
-                this.status.jump.currents--;
-                if(this.status.lastDirection == "right") this.switchSprite('jumpRight');
-                else if(this.status.lastDirection == "left") this.switchSprite('jumpLeft');
-            };
-            
-            this.keys.KeyJump.pressed = false;
-        };
-    };
-
-    private switchSprite(name: string): void {
-        if(this.animations) {
-            if(this.image === this.animations[name].image) return;
-            this.currentFrame = 0;
-            if (this.animations[name] && this.animations[name].image !== undefined) {
-                this.image = this.animations[name].image || this.image;
-            }
-            this.frameRate = this.animations[name].frameRate;
-            this.frameBuffer = this.animations[name].frameBuffer;
-            this.loop = this.animations[name].loop;
-            this.currentAnimation = this.animations[name];
-        }
     };
 
     private actions(): ActionInterface[] {
@@ -162,6 +123,48 @@ export class Player extends Sprite {
         ];
     };
 
+    private switchSprite(name: string): void {
+        if(this.animations) {
+            if(this.image === this.animations[name].image) return;
+            this.currentFrame = 0;
+            if (this.animations[name] && this.animations[name].image !== undefined) {
+                this.image = this.animations[name].image || this.image;
+            }
+            this.frameRate = this.animations[name].frameRate;
+            this.frameBuffer = this.animations[name].frameBuffer;
+            this.loop = this.animations[name].loop;
+            this.currentAnimation = this.animations[name];
+        }
+    };
+
+    private movements(): void {
+        this.velocity.x = 0;
+
+        if(this.keys.KeyMoveRight.pressed) {
+            this.velocity.x = 10;
+            this.switchSprite('idleRight');
+            this.status.lastDirection = "right";
+        } else if(this.keys.KeyMoveLeft.pressed) {
+            this.velocity.x = -10;
+            this.switchSprite('idleLeft');
+            this.status.lastDirection = "left";
+        } else {
+            if(this.status.lastDirection == "right") this.switchSprite('idleRight');
+            else if(this.status.lastDirection == "left") this.switchSprite('idleLeft');
+        }
+
+        if(this.keys.KeyJump.pressed) {
+            if(this.status.jump.currents !== 0) {
+                this.velocity.y = -15;
+                this.status.jump.currents--;
+                if(this.status.lastDirection == "right") this.switchSprite('jumpRight');
+                else if(this.status.lastDirection == "left") this.switchSprite('jumpLeft');
+            };
+            
+            this.keys.KeyJump.pressed = false;
+        };
+    };
+
     private drawPlayer(): void {
         // this.ctx.fillStyle = "rgba(255,0,0, 0.2)";
 
@@ -177,7 +180,7 @@ export class Player extends Sprite {
         this.hitBox = {
             position: {
                 x: this.position.x,
-                y: this.position.y + 8
+                y: this.position.y
             },
             size: {
                 width: 56, // 64 - 1 * pixelSize(8)

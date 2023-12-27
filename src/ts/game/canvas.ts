@@ -1,6 +1,5 @@
 import { clearWindow, findObject, preventDefaults } from "./auxfunctions.js";
 import { GameCreator } from "./class/utils/GameCreator.js";
-import { KeyBoard } from "./class/utils/Keyboard.js";
 import { Mouse } from "./class/utils/Mouse.js";
 
 interface SizeInterface {
@@ -68,7 +67,7 @@ export class Canvas {
                     src: "./assets/img/jumpLeft.png",
                 }
             }
-        })
+        });
 
         this.gameCreator.createSprite({
             position: {
@@ -98,7 +97,6 @@ export class Canvas {
         this.ctx.imageSmoothingQuality = 'high';
 
         preventDefaults();
-        
 
         this.defineInputs();
         this.draw();

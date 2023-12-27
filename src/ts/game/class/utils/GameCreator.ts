@@ -1,7 +1,9 @@
-import { findObject } from "../../auxfunctions.js";
+import { createObjectsFrom2D, findObject, parse2D } from "../../auxfunctions.js";
+import { collisionOfLevel } from "../../data/collisions.js";
 import { AnimationsInterface, PositionInterface, SizeInterface } from "../../interfaces.js";
 import { Player } from "../elements/Player.js";
 import { InterfaceElement } from "../interface/InterfaceElement.js";
+import { CollisionBlock } from "./CollisionBlock.js";
 import { KeyBoard } from "./Keyboard.js";
 import { Mouse } from "./Mouse.js";
 import { Sprite } from "./Sprite.js";
@@ -23,6 +25,7 @@ export class GameCreator {
     readonly ctx: CanvasRenderingContext2D;
     readonly mouse: Mouse;
     layers: LayerInterface[];
+    collisionBlocks: any[];
 
     constructor({ canvas, ctx, mouse }: GameCreatorInterface) {
         this.canvas = canvas;
@@ -40,6 +43,7 @@ export class GameCreator {
                 setups: []
             }
         ];
+        this.collisionBlocks = [];
     };
 
     public createPlayer(
@@ -69,7 +73,7 @@ export class GameCreator {
         const layer = findObject({list: layers, key: "name", keyValue: "Player"});
         layer.elements.push(player);
         layer.setups.push(player);
-    }
+    };
 
     public createBox(
         { size, position }: {
@@ -115,6 +119,17 @@ export class GameCreator {
         findObject({list: layers, key: "name", keyValue: "UI"}).elements.push(sprite);
     };
 
+    private createCollisions(): void {
+        const parsedCollisions = parse2D({
+            array: collisionOfLevel
+        });
+
+        this.collisionBlocks = createObjectsFrom2D({
+            ctx: this.ctx,
+            array: parsedCollisions
+        });
+    };
+
     private updateLayer(name: string): void {
         const layer = findObject({list: this.layers, key: "name", keyValue: name}).elements;
         layer.forEach((element: { update: () => void; }) => {
@@ -125,9 +140,15 @@ export class GameCreator {
     public update(): void {
         this.updateLayer("Player");
         this.updateLayer("UI");
+
+        this.collisionBlocks.forEach(collisionBlock => {
+            collisionBlock.update();
+        });
     };
 
     public setup(): void {
+        this.createCollisions();
+
         this.layers.forEach(layer => {
             layer.setups.forEach((element: { setup: () => void; }) => {
                 element.setup();
