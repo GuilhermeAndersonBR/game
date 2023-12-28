@@ -103,10 +103,6 @@ export class Canvas {
 
         this.drawBackground();
 
-        this.gameCreator.collisionBlocks.forEach(collisionBlock => {
-            collisionBlock.update();
-        });
-
         this.camera?.update();
 
         this.camera?.reset();
@@ -136,8 +132,6 @@ export class Canvas {
         const cameraObjects = [
             player
         ];
-
-        console.log(player);
 
         this.camera = new Camera({
             canvas: this.canvas,

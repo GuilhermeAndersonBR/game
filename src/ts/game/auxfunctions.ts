@@ -34,7 +34,6 @@ export const preventDefaults = (): void => {
 
 export const parse2D = ({ array }: {array: any[]}): any[] => {
     const rows = [];
-    console.log(array.length);
     for (let i = 0; i < array.length; i += 24) {
         rows.push(array.slice(i, i + 24));
     };

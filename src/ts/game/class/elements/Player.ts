@@ -194,9 +194,6 @@ export class Player extends Sprite {
     };
 
     public setup(): void {
-        console.log("setup feito com sucesso");
-        console.log(this.collisions);
-        
         this.keyBoard.update();
     };
 
