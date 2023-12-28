@@ -9,4 +9,6 @@ const canvas = new Canvas({
     }
 });
 
+(document.getElementById("canvas") as HTMLCanvasElement).style.cursor = 'url("./assets/img/cursor.png"), auto';
+
 canvas.setup();
