@@ -138,7 +138,6 @@ export class GameCreator {
     };
 
     public update(): void {
-        this.updateLayer("Player");
         this.updateLayer("UI");
     };
 

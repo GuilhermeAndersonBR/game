@@ -77,6 +77,14 @@ export class Player extends Sprite {
                 currents: 0,
                 limit: 2,
             },
+            dash: {
+                isDashing: false,
+                duration: 0,
+                limitDuration: 8,
+                speed: 30,
+                cooldown: 60,
+                currentDashCooldown: 0
+            },
             lastDirection: "right"
         }
 
@@ -91,6 +99,9 @@ export class Player extends Sprite {
                 pressed: false
             },
             KeyAttack: {
+                pressed: false
+            },
+            KeyDash: {
                 pressed: false
             }
         }
@@ -124,6 +135,14 @@ export class Player extends Sprite {
                     this.keys.KeyJump.pressed = true;
                 },
             },
+            {
+                code: "Space",
+                keydown: () => {
+                    if(this.status.dash.currentDashCooldown < 12) {
+                        this.keys.KeyDash.pressed = true;
+                    }
+                }
+            }
         ];
     };
 
@@ -144,29 +163,58 @@ export class Player extends Sprite {
     private movements(): void {
         this.velocity.x = 0;
 
-        if(this.keys.KeyMoveRight.pressed) {
-            this.velocity.x = 10;
-            this.switchSprite('idleRight');
-            this.status.lastDirection = "right";
-        } else if(this.keys.KeyMoveLeft.pressed) {
-            this.velocity.x = -10;
-            this.switchSprite('idleLeft');
-            this.status.lastDirection = "left";
+        if (this.status.dash.isDashing) {
+            if(this.status.lastDirection === "right") {
+                this.velocity.y = 0;
+                this.velocity.x = this.status.dash.speed;
+                this.switchSprite('dashRight');
+            } else if(this.status.lastDirection === "left") {
+                this.velocity.y = 0;
+                this.velocity.x = -this.status.dash.speed;
+                this.switchSprite('dashLeft');
+            }
+            this.status.dash.duration--;
+    
+            if (this.status.dash.duration <= 0) {
+                this.status.dash.isDashing = false;
+                this.status.dash.currentDashCooldown = this.status.dash.cooldown;
+            }
         } else {
-            if(this.status.lastDirection == "right") this.switchSprite('idleRight');
-            else if(this.status.lastDirection == "left") this.switchSprite('idleLeft');
+            
+            if(this.keys.KeyMoveRight.pressed) {
+                this.velocity.x = 10;
+                this.switchSprite('idleRight');
+                this.status.lastDirection = "right";
+            } else if(this.keys.KeyMoveLeft.pressed) {
+                this.velocity.x = -10;
+                this.switchSprite('idleLeft');
+                this.status.lastDirection = "left";
+            } else {
+                if(this.status.lastDirection == "right") this.switchSprite('idleRight');
+                else if(this.status.lastDirection == "left") this.switchSprite('idleLeft');
+            }
+    
+            if(this.keys.KeyJump.pressed) {
+                if(this.status.jump.currents !== 0) {
+                    this.velocity.y = -15;
+                    this.status.jump.currents--;
+                    if(this.status.lastDirection == "right") this.switchSprite('jumpRight');
+                    else if(this.status.lastDirection == "left") this.switchSprite('jumpLeft');
+                };
+                
+                this.keys.KeyJump.pressed = false;
+            };
+    
+            if (this.keys.KeyDash.pressed && this.status.dash.currentDashCooldown === 0) {
+                this.status.dash.isDashing = true;
+                this.status.dash.duration = this.status.dash.limitDuration;
+                this.keys.KeyDash.pressed = false;
+            }
         }
 
-        if(this.keys.KeyJump.pressed) {
-            if(this.status.jump.currents !== 0) {
-                this.velocity.y = -15;
-                this.status.jump.currents--;
-                if(this.status.lastDirection == "right") this.switchSprite('jumpRight');
-                else if(this.status.lastDirection == "left") this.switchSprite('jumpLeft');
-            };
-            
-            this.keys.KeyJump.pressed = false;
-        };
+        if (this.status.dash.currentDashCooldown > 0) {
+            this.status.dash.currentDashCooldown--;
+        }
     };
 
     private drawHitBox(): void {
@@ -288,5 +336,7 @@ export class Player extends Sprite {
         super.update();
         
         this.movements();
+
+        
     }
 }

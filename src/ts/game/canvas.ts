@@ -68,6 +68,18 @@ export class Canvas {
                     frameBuffer: 12,
                     loop: false,
                     src: "./assets/img/jumpLeft.png",
+                },
+                dashRight: {
+                    frameRate: 1,
+                    frameBuffer: 12,
+                    loop: false,
+                    src: "./assets/img/dashRight.png",
+                },
+                dashLeft: {
+                    frameRate: 1,
+                    frameBuffer: 12,
+                    loop: false,
+                    src: "./assets/img/dashLeft.png",
                 }
             }
         });
@@ -107,7 +119,7 @@ export class Canvas {
 
         this.camera?.reset();
 
-        this.draw();
+        this.gameCreator.update();
     };
 
     private defineInputs(): void {

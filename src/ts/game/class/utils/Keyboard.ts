@@ -19,6 +19,7 @@ export class KeyBoard {
 
     private newPressed(): void {
         window.addEventListener("keydown", (event : KeyEventInterface): void => {
+            console.log(event.code);
             this.actions.forEach((action: ActionInterface) => {
                 if(event.code === action.code && action.keydown) {
                     action.keydown();
