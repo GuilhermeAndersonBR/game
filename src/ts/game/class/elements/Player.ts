@@ -1,7 +1,8 @@
-import { ActionInterface, PositionInterface, SizeInterface } from "../../interfaces.js";
+import { ActionInterface, PositionInterface, SizeInterface, StatusInterface } from "../../interfaces.js";
 import { CollisionBlock } from "../utils/CollisionBlock.js";
 import { KeyBoard } from "../utils/Keyboard.js";
 import { Sprite, SpriteInterface } from "../utils/Sprite.js";
+import { Inventory } from "./Inventory.js";
 
 interface PlayerInterface {
     canvas: HTMLCanvasElement,
@@ -18,11 +19,11 @@ interface HitBoxInterface {
 
 interface KeyInterface {
     pressed: boolean
-}
+};
 
 interface KeysInterface {
     [key: string]: KeyInterface
-}
+};
 
 export class Player extends Sprite {
     readonly canvas: HTMLCanvasElement;
@@ -33,7 +34,8 @@ export class Player extends Sprite {
     velocity: PositionInterface;
     keys: KeysInterface;
     gravity: number;
-    status: any;
+    status: StatusInterface;
+    inventory: Inventory;
 
     constructor({ 
         canvas, ctx, collisions, position, src, frameRate, animations, frameBuffer, loop, autoplay 
@@ -49,6 +51,7 @@ export class Player extends Sprite {
             loop: loop,
             autoplay: autoplay
         });
+        
         this.canvas = canvas;
         this.ctx = ctx;
         this.collisions = collisions;
@@ -73,6 +76,9 @@ export class Player extends Sprite {
         };
 
         this.status = {
+            health: 100,
+            attack: 10,
+            defense: 5,
             jump: {
                 currents: 0,
                 limit: 2,
@@ -80,13 +86,15 @@ export class Player extends Sprite {
             dash: {
                 isDashing: false,
                 duration: 0,
-                limitDuration: 8,
-                speed: 30,
-                cooldown: 60,
+                limitDuration: 16,
+                speed: 15,
+                cooldown: 28,
                 currentDashCooldown: 0
             },
             lastDirection: "right"
         }
+
+        this.inventory = new Inventory();
 
         this.keys = {
             KeyMoveRight: {
@@ -337,6 +345,8 @@ export class Player extends Sprite {
         
         this.movements();
 
-        
+        this.status = this.inventory.applyInventoryEffects(this.status);
+
+        console.log(this.status.attack);
     }
 }

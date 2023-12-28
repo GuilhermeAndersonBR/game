@@ -1,4 +1,5 @@
 O que fazer:
+    *Câmera Dinâmica[v];
     *Tentar iniciar a lógica de sons[];
     *Fazer um sistema de parallax[];
     *Iniciar o sistema de Combate[];

@@ -1,6 +1,7 @@
 import { createObjectsFrom2D, findObject, parse2D } from "../../auxfunctions.js";
 import { collisionOfLevel } from "../../data/collisions.js";
 import { AnimationsInterface, PositionInterface, SizeInterface } from "../../interfaces.js";
+import { Item } from "../elements/Item.js";
 import { Player } from "../elements/Player.js";
 import { InterfaceElement } from "../interface/InterfaceElement.js";
 import { CollisionBlock } from "./CollisionBlock.js";
@@ -24,6 +25,7 @@ export class GameCreator {
     readonly ctx: CanvasRenderingContext2D;
     readonly mouse: Mouse;
     layers: LayerInterface[];
+    affectedsWithCamera: any[];
     collisionBlocks: CollisionBlock[];
 
     constructor({ canvas, ctx, mouse }: GameCreatorInterface) {
@@ -32,23 +34,19 @@ export class GameCreator {
         this.mouse = mouse;
         this.layers = [
             {
-                name: "Player",
-                elements: [],
-                setups: []
-            },
-            {
                 name: "UI",
                 elements: [],
                 setups: []
             }
         ];
+        this.affectedsWithCamera = [];
         this.collisionBlocks = [];
     };
 
-    public createPlayer(
+    public createItem(
         { position, src, frameRate, animations, frameBuffer, loop, autoplay }: {
-            src: string,
             position: PositionInterface,
+            src?: string,
             frameRate?: number,
             animations?: AnimationsInterface,
             frameBuffer?: number,
@@ -57,12 +55,17 @@ export class GameCreator {
         }
     ): void {
         const { canvas, ctx, layers } = this;
-        const player = new Player({
+        const element = new Item({
             canvas: canvas,
             ctx: ctx,
-            collisions: this.collisionBlocks,
             position: position,
-            src: src,
+            name: "Espada_Teste",
+            description: "___01___",
+            status: {
+                attack: 1
+            },
+            effect: () => {console.log("a")},
+            src: "./assets/img/scc.png",
             frameRate: frameRate,
             animations: animations,
             frameBuffer: frameBuffer,
@@ -70,26 +73,7 @@ export class GameCreator {
             autoplay: autoplay
         });
 
-        const layer = findObject({list: layers, key: "name", keyValue: "Player"});
-        layer.elements.push(player);
-        layer.setups.push(player);
-    };
-
-    public createBox(
-        { size, position }: {
-            size: SizeInterface,
-            position: PositionInterface
-        }
-    ): void {
-        const { canvas, ctx, layers } = this;
-        const element = new InterfaceElement({
-            canvas: canvas,
-            ctx: ctx,
-            size: size,
-            position: position
-        });
-
-        findObject({list: layers, key: "name", keyValue: "UI"}).elements.push(element);
+        this.affectedsWithCamera.push(element);
     };
 
     public createSprite(

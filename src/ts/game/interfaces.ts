@@ -25,3 +25,22 @@ export interface ActionInterface {
     keydown?: () => void;
     keyup?: () => void;
 };
+
+export interface StatusInterface {
+    health: number,
+    attack: number,
+    defense: number,
+    jump: {
+        currents: number,
+        limit: number
+    },
+    dash: {
+        isDashing: boolean,
+        duration: number,
+        limitDuration: number,
+        speed: number,
+        cooldown: number,
+        currentDashCooldown: number
+    },
+    lastDirection: "right" | "left"
+};

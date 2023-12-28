@@ -1,4 +1,6 @@
 import { clearWindow, findObject, preventDefaults } from "./auxfunctions.js";
+import { Item } from "./class/elements/Item.js";
+import { Player } from "./class/elements/Player.js";
 import { Camera } from "./class/utils/Camera.js";
 import { GameCreator } from "./class/utils/GameCreator.js";
 import { Mouse } from "./class/utils/Mouse.js";
@@ -20,6 +22,7 @@ export class Canvas {
     readonly size: SizeInterface;
     readonly mouse: Mouse;
     gameCreator: GameCreator;
+    player?: Player;
     camera?: Camera;
 
     constructor({ canvas, ctx, size }: CanvasInterface) {
@@ -32,11 +35,32 @@ export class Canvas {
             ctx: this.ctx,
             mouse: this.mouse,
         });
+        this.player;
         this.camera;
     };
 
     private draw(): void {
-        this.gameCreator.createPlayer({
+
+        const sword = new Item({
+            canvas: this.canvas,
+            ctx: this.ctx,
+            name: "Espada",
+            description: "teste",
+            effect: () => {console.log("a")},
+            position: {
+                x: 30,
+                y: 504
+            },
+            src: "./assets/img/scc.png",
+            status: {
+                attack: 1
+            }
+        });
+
+        this.player = new Player({
+            canvas: this.canvas,
+            ctx: this.ctx,
+            collisions: this.gameCreator.collisionBlocks,
             src: "./assets/img/idleRight.png",
             position: {
                 x: 50,
@@ -84,14 +108,7 @@ export class Canvas {
             }
         });
 
-        this.gameCreator.createSprite({
-            position: {
-                x: 30,
-                y: 184
-            },
-            frameRate: 9,
-            src: "./assets/img/animation.png"
-        });
+        this.player.inventory.addToInventory(sword);
     };
 
     private drawBackground(): void {
@@ -137,20 +154,25 @@ export class Canvas {
         this.defineInputs();
         this.gameCreator.createCollisions();
         this.draw();
+        this.player?.setup();
         this.gameCreator.setup();
 
-        const player = findObject({list: this.gameCreator.layers, key: "name", keyValue: "Player"}).elements[0];
+        if(this.player) {
+            const cameraObjects = [
+                this.player
+            ];
 
-        const cameraObjects = [
-            player
-        ];
-
-        this.camera = new Camera({
-            canvas: this.canvas,
-            ctx: this.ctx,
-            player: player,
-            objectsToTrack: cameraObjects,
-        });
+            this.gameCreator.affectedsWithCamera.forEach(element => {
+                cameraObjects.push(element);
+            });
+    
+            this.camera = new Camera({
+                canvas: this.canvas,
+                ctx: this.ctx,
+                player: this.player,
+                objectsToTrack: cameraObjects,
+            });
+        }
         
         this.update();
     };
