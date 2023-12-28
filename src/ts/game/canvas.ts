@@ -1,4 +1,5 @@
-import { clearWindow, preventDefaults } from "./auxfunctions.js";
+import { clearWindow, findObject, preventDefaults } from "./auxfunctions.js";
+import { Camera } from "./class/utils/Camera.js";
 import { GameCreator } from "./class/utils/GameCreator.js";
 import { Mouse } from "./class/utils/Mouse.js";
 
@@ -19,6 +20,7 @@ export class Canvas {
     readonly size: SizeInterface;
     readonly mouse: Mouse;
     gameCreator: GameCreator;
+    camera?: Camera;
 
     constructor({ canvas, ctx, size }: CanvasInterface) {
         this.canvas = canvas;
@@ -30,6 +32,7 @@ export class Canvas {
             ctx: this.ctx,
             mouse: this.mouse,
         });
+        this.camera;
     };
 
     private draw(): void {
@@ -79,11 +82,36 @@ export class Canvas {
         });
     };
 
+    private drawBackground(): void {
+        const image = new Image();
+        image.src = "./assets/img/map.png";
+        this.ctx.drawImage(
+            image,
+            0,
+            0,
+            this.canvas.width,
+            this.canvas.height
+        );
+    };
+
     private update = (): void => {
         requestAnimationFrame(this.update);
-        clearWindow({canvas: this.canvas, ctx: this.ctx});
 
-        this.gameCreator.update();
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        this.camera?.applyCameraTransform();
+
+        this.drawBackground();
+
+        this.gameCreator.collisionBlocks.forEach(collisionBlock => {
+            collisionBlock.update();
+        });
+
+        this.camera?.update();
+
+        this.camera?.reset();
+
+        this.draw();
     };
 
     private defineInputs(): void {
@@ -102,6 +130,22 @@ export class Canvas {
         this.gameCreator.createCollisions();
         this.draw();
         this.gameCreator.setup();
+
+        const player = findObject({list: this.gameCreator.layers, key: "name", keyValue: "Player"}).elements[0];
+
+        const cameraObjects = [
+            player
+        ];
+
+        console.log(player);
+
+        this.camera = new Camera({
+            canvas: this.canvas,
+            ctx: this.ctx,
+            player: player,
+            objectsToTrack: cameraObjects,
+        });
+        
         this.update();
     };
 };
